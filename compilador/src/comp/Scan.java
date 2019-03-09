@@ -21,6 +21,11 @@ public class Scan {
 
 	private Deque<Token.MyTokens> tokens = new ArrayDeque<>();
 	int count = 1;
+	
+	public Deque<?> getTokens(){
+		return tokens;
+	}
+	
 	public Scan(String args) {
 		System.out.println(Token.MyTokens.values()[0]);
 		System.out.println("10".matches("\\d+"));
@@ -36,7 +41,7 @@ public class Scan {
 				{
 					int i = 0;
 					String tokenTemp = "";
-					System.out.printf("Linha %d: ", count++);
+					System.out.printf("%4d  ", count++);
 					while(i<s.length()){
 						
 						tokenTemp += s.charAt(i++);
@@ -47,49 +52,65 @@ public class Scan {
 							if(tokenTemp.equals("/") && s.charAt(i) == '/') break;
 							if(tokenTemp.equals("*") && s.charAt(i) == '*') {
 								tokenTemp += "*";
+								++i ;
+							}
+							if(tokenTemp.equals("<") && s.charAt(i) == '='){
+								tokenTemp += "=";
+								++i;
+							}
+							if(tokenTemp.equals(">") && s.charAt(i) == '='){
+								tokenTemp += "=";
+								++i;
+							}
+							if(tokenTemp.equals('=') && s.charAt(i) == '='){
+								tokenTemp += '=';
 								++i;
 							}
 							
+							if(tokenTemp.length()>0 )
 							switch(s.charAt(i)) {
 							// capture identifiers
-								case '[': case ',': case '(': case '=': case ':':
-									if (!contains(tokenTemp)) {
+								case ',': case '(': case '=': case ':': case ' ':
+									if (!contains(tokenTemp)) { 
 										Token.MyTokens temp = Token.MyTokens.IDENTIFIER;
 										temp.setIdentConstValue(tokenTemp);
+										temp.line = count -1;
+										temp.column = i-tokenTemp.length();
 										tokens.push(temp);
 										tokenTemp = "";
 										System.out.print(tokens.getFirst().name() +" ");
 									}
 									break;
-								case ';':
+								case ';': case ')': case '+': case '*': case '/': case '-': case ']': case '[':
+								case '>': case '<':
 									if( tokenTemp.matches("\\d+")) {
 										Token.MyTokens temp = Token.MyTokens.INTCONSTANT;
 										temp.setIdentConstValue(tokenTemp);
+										temp.line = count -1;
+										temp.column = i-tokenTemp.length();
 										tokens.push(temp);
 										tokenTemp = "";
 										System.out.print(tokens.getFirst().name() +" ");
-									} else {
+									} else if(!contains(tokenTemp)){
 										Token.MyTokens temp = Token.MyTokens.IDENTIFIER;
 										temp.setIdentConstValue(tokenTemp);
+										temp.line = count -1;
+										temp.column = i-tokenTemp.length();
 										tokens.push(temp);
 										tokenTemp = "";
 										System.out.print(tokens.getFirst().name() +" ");
 									}
 									break;
-								case ']': 
-									if( tokenTemp.matches("\\d+")) {
-										Token.MyTokens temp = Token.MyTokens.INTCONSTANT;
-										temp.setIdentConstValue(tokenTemp);
-										tokens.push(temp);
-										tokenTemp = "";
-										System.out.print(tokens.getFirst().name() +" ");
-									}
+								
 							}
 						}
 						boolean b = contains(tokenTemp);
 						
 						if (b) {
-							tokens.push(nextToken(tokenTemp));
+							Token.MyTokens temp = nextToken(tokenTemp);
+							temp.line = count -1;
+							temp.column = i-tokenTemp.length();
+							tokens.push(temp);
 							System.out.print(tokens.getFirst().name() +" ");
 							// DAT: desempilha e acessa token
 							tokenTemp = "";
@@ -99,7 +120,7 @@ public class Scan {
 					System.out.println();
 			});
 		} catch (NoSuchFileException e) {
-			System.out.printf("Arquivo '%s' n�o encontrado.", args);
+			System.out.printf("Arquivo '%s' nao encontrado.", args);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,7 +128,7 @@ public class Scan {
 	
 	
 	public boolean contains(String lexema){
-		return Arrays.stream(Token.MyTokens.values()).anyMatch(t -> t.toString().equalsIgnoreCase(lexema));
+		return Arrays.stream(Token.MyTokens.values()).anyMatch(t -> t.toString().equalsIgnoreCase(lexema) && t.name()!=Token.MyTokens.IDENTIFIER.name());
 	}
 	
 	public Token.MyTokens nextToken(String lexema){

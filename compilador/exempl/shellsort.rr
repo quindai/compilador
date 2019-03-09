@@ -9,14 +9,14 @@ pgm   //Shell sort
     }
     while(gap > 1) {
       gap = gap / 3;
-      repeat i from gap to size{
+      repeat (i) from (gap) to (size){
         h = v[i];
-        j = i
+        j = i;
         while(j >= gap and h < v[j-gap]){
           vet[j] = v[j-gap];
           j = j-gap;
         }
-        v[j] = value
+        v[j] = value;
       }
     }
    return v;
