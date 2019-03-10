@@ -1,0 +1,5 @@
+pgm
+   main{
+    print("Ola mundo");
+}
+end_pgm

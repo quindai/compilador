@@ -1,0 +1,23 @@
+pgm
+ int valor;
+ func fibo(int n){
+   int prev, atual, temp, i;
+   prev = 0;
+   i = 0;
+   atual = 1;
+   repeat i from 0 to n{
+     if(i==0){print(i +",");}
+     else{
+       if(i < 2){print(atual +",");}
+       else{
+         temp = atual;
+         atual = atual + prev;
+         prev = temp;
+         print(atual +",");
+       }
+     }
+  }
+   main{
+    fibo(10)
+}
+end_pgm

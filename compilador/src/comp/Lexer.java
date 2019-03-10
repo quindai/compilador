@@ -4,9 +4,9 @@ public class Lexer {
 
 	public Lexer(String args) {
 		Scan sc = new Scan(args);
-		Token.MyTokens s;
+		Token s;
 		while (sc.getTokens().iterator().hasNext()){
-			s = (Token.MyTokens)sc.getTokens().pollLast();
+			s = (Token)sc.getTokens().pollLast();
 			System.out.printf("%8s[%04d, %04d] (%04d, %20s) {%s}\n",
 					"",	s.line, s.column, s.ordinal(), s.name(), s.toString());
 		}

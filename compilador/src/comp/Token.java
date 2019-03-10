@@ -1,26 +1,25 @@
 package comp;
 
-public class Token {
-	public void nextToken(){}
+public enum Token {
+	
 	// codigos para os tokens
-	public static enum MyTokens{
 		// palavras reservadas
-		MYINT ("int"), 	MYREAL ("real"), MYSTRING ("string"), MYCHAR ("char"), MYBOOL ("bool"), 
-		MYARRAY ("array"), IF ("if"), ELSE ("else"), WHILE ("while"),  MYRETURN ("return"),
+		RD_INT ("int"), 	RD_REAL ("real"), RD_STRING ("string"), RD_CHAR ("char"), RD_BOOL ("bool"), 
+		RD_ARRAY ("array"), IF ("if"), ELSE ("else"), WHILE ("while"),  RD_RETURN ("return"),
 		FROM ("from"), REPEAT ("repeat"), MAIN ("main"), PGM ("pgm"), 
 		END_PGM ("end_pgm"), AND ("and"), MOD ("mod"), INTDIV ("div"), 
 		TO ("to"), TRUE ("true"), FALSE ("false"), OR ("or"), NOT ("not"), 
-		PRINT ("print"), FUNC ("func"), IDENTIFIER ("identifier"),
-		INTCONSTANT ("intconstant"),
+		PRINT ("print"), FUNC ("func"), IDENTIFIER ("identifier"), STEP ("step"),
+		INTCONSTANT ("intconstant"), RD_ERROR ("rd_error"),
 		
 		// simbolos especiais
 		COMMENT ("//"),	EQ("=="), ASSIGN ("="), NE ("<>"), LT ("<"), LE ("<="), GT (">"), 
 		GE (">="), PLUS ("+"), MINUS ("-"), UNARY ("~"), MULT ("*"),
 		POW ("**"), SRBRAC ("]"), SLBRAC ("["), DIVIDE ("/"), RPAREN (")"), LPAREN ("("), RBRAC ("}"),
-		LBRAC ("{"), COLON (":"), SEMICOLON (";"),  COMA (",");
+		LBRAC ("{"), COLON (":"), SEMICOLON (";"),  COMA (","), DOUBLE_QUOTES ("\"");
 		
 		
-		private static final int FIRST_RESERVED_INDEX = MYINT.ordinal();
+		private static final int FIRST_RESERVED_INDEX = RD_INT.ordinal();
 		private static final int LAST_RESERVED_INDEX = INTCONSTANT.ordinal();
 		
 		private static final int FIRST_SPECIAL_INDEX = COMMENT.ordinal();
@@ -29,22 +28,22 @@ public class Token {
 		String value;
 		int line, column;
 
-		MyTokens(String value){
+		Token(String value){
 				//this.code = code;
 				this.value = value;
 		}
 	
+		public void nextToken(){}
+		
 		public void setIdentConstValue(String value) {
 			this.value = value;
 		}
 		
-		private MyTokens() {// TODO apagar construtor
+		private Token() {// TODO apagar construtor
 		}
 		 @Override
-		    public String toString() {
-		        return value;
-		    }
-	}
-	
+	    public String toString() {
+	        return value;
+	    }
 	
 }

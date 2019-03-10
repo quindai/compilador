@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 //https://www.baeldung.com/java-array-deque
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class Scan {
 
-	private Deque<Token.MyTokens> tokens = new ArrayDeque<>();
+	private Deque<Token> tokens = new ArrayDeque<>();
 	int count = 1;
 	
 	public Deque<?> getTokens(){
@@ -27,15 +28,15 @@ public class Scan {
 	}
 	
 	public Scan(String args) {
-		System.out.println(Token.MyTokens.values()[0]);
-		System.out.println("10".matches("\\d+"));
+		//System.out.println(Token.values()[0]);
+		//System.out.println("10".matches("\\d+"));
+		//System.out.println(Pattern.compile("\".*\"").matcher("\"Ola mundo").find() );
 //		System.out.println(Token.MyTokens.valueOf("INT"));
 /*		Token.MyTokens m = Arrays.stream(Token.MyTokens.values())
 				.filter(t -> t.toString().equalsIgnoreCase("int"))
 				.findFirst().get();
 				*/
 	//	System.out.println( m.name() );
-		
 		try(Stream<String> str = Files.lines(Paths.get(args))){
 			str.forEach(s-> 
 				{
@@ -67,12 +68,39 @@ public class Scan {
 								++i;
 							}
 							
+							// capturing double quotes strings
+							// Quote? Each pair of adjacent quotes represents a single-quote.
+							if(tokenTemp.equals(Token.DOUBLE_QUOTES.value)){
+								do{
+									tokenTemp += s.charAt(i);
+								}while((s.charAt(i) != '"') && (++i < s.length()));
+
+								++i; // corrects the last char read
+								if(Pattern.compile("\".*\"").matcher(tokenTemp).find()){
+									Token temp = Token.RD_STRING;
+									temp.setIdentConstValue(tokenTemp);
+									temp.line = count -1;
+									temp.column = i-tokenTemp.length();
+									tokens.push(temp);
+									tokenTemp = "";
+									System.out.print(tokens.getFirst().name() +" ");
+								} else{
+									Token temp = Token.RD_ERROR;
+									temp.setIdentConstValue(tokenTemp);
+									temp.line = count -1;
+									temp.column = i-tokenTemp.length();
+									tokens.push(temp);
+									tokenTemp = "";
+									System.out.print(tokens.getFirst().name() +" ");
+								}
+							}
+							
 							if(tokenTemp.length()>0 )
 							switch(s.charAt(i)) {
 							// capture identifiers
 								case ',': case '(': case '=': case ':': case ' ':
 									if (!contains(tokenTemp)) { 
-										Token.MyTokens temp = Token.MyTokens.IDENTIFIER;
+										Token temp = Token.IDENTIFIER;
 										temp.setIdentConstValue(tokenTemp);
 										temp.line = count -1;
 										temp.column = i-tokenTemp.length();
@@ -84,7 +112,7 @@ public class Scan {
 								case ';': case ')': case '+': case '*': case '/': case '-': case ']': case '[':
 								case '>': case '<':
 									if( tokenTemp.matches("\\d+")) {
-										Token.MyTokens temp = Token.MyTokens.INTCONSTANT;
+										Token temp = Token.INTCONSTANT;
 										temp.setIdentConstValue(tokenTemp);
 										temp.line = count -1;
 										temp.column = i-tokenTemp.length();
@@ -92,7 +120,7 @@ public class Scan {
 										tokenTemp = "";
 										System.out.print(tokens.getFirst().name() +" ");
 									} else if(!contains(tokenTemp)){
-										Token.MyTokens temp = Token.MyTokens.IDENTIFIER;
+										Token temp = Token.IDENTIFIER;
 										temp.setIdentConstValue(tokenTemp);
 										temp.line = count -1;
 										temp.column = i-tokenTemp.length();
@@ -107,7 +135,7 @@ public class Scan {
 						boolean b = contains(tokenTemp);
 						
 						if (b) {
-							Token.MyTokens temp = nextToken(tokenTemp);
+							Token temp = nextToken(tokenTemp);
 							temp.line = count -1;
 							temp.column = i-tokenTemp.length();
 							tokens.push(temp);
@@ -128,11 +156,11 @@ public class Scan {
 	
 	
 	public boolean contains(String lexema){
-		return Arrays.stream(Token.MyTokens.values()).anyMatch(t -> t.toString().equalsIgnoreCase(lexema) && t.name()!=Token.MyTokens.IDENTIFIER.name());
+		return Arrays.stream(Token.values()).anyMatch(t -> t.toString().equalsIgnoreCase(lexema) && t.name()!=Token.IDENTIFIER.name());
 	}
 	
-	public Token.MyTokens nextToken(String lexema){
-		return  Arrays.stream(Token.MyTokens.values())
+	public Token nextToken(String lexema){
+		return  Arrays.stream(Token.values())
 				.filter(t -> t.toString().equalsIgnoreCase(lexema))
 				.findFirst().get();
 	}
