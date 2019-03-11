@@ -3,6 +3,7 @@ package comp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Deque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -10,7 +11,9 @@ import java.util.stream.Stream;
 //https://www.regextester.com/15
 
 public class Parser {
-	Parser(String args) throws IOException{
+	private Deque<Token> tokens;
+	
+	Parser(String args, boolean b) throws IOException{
 		Pattern p = Pattern.compile("(//).*|([\"'])(?:[^\"']+|(?!\\1)[\"'])*\\1|\\|\\||<=|&&|\\-|[()\\[\\]{};=#]|[\\w.-]+");
 		//
 		try(Stream<String> str = Files.lines(Paths.get(args))){
@@ -23,6 +26,13 @@ public class Parser {
 			
 		}
 	}
+	
+	public Parser(String args) {
+		tokens = new Scan(args).getTokens();
+				while(tokens.iterator().hasNext())
+					System.out.print(tokens.pollLast());
+	}
+	
 	public static void main(String[] args) throws IOException {
 		new Parser(args[0]);
 	}
