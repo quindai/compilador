@@ -1,0 +1,7 @@
+pgm
+   main{
+	real r = 5.6-7;
+	print("Ola mundo");
+
+}
+end_pgm

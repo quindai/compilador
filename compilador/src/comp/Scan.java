@@ -120,10 +120,18 @@ public class Scan {
 											// reads next char if its number
 											//Pattern p = Pattern.compile("(\\d+|E?|e?)(+|-)?\\d+");
 											//Matcher m;
-											while((i+1 != s.length()) && (Pattern.matches("\\.\\d+((E|e)?(\\+|-)?\\d)*", fraction) || 
-													Character.toString(s.charAt(i+1)).matches("(\\+|-)?\\d?"))){
-												fraction += s.charAt(++i);
+											//while((i+1 != s.length()) && (Pattern.matches("\\.\\d+((E|e)?(\\+|-)?\\d)*", fraction) || 
+											//		Character.toString(s.charAt(i+1)).matches("(\\+|-)?\\d?"))){
+											//	fraction += s.charAt(++i);
+											//}
+											while ((++i < s.length()) && (Pattern.matches("\\.\\d+", fraction)))
+												fraction += s.charAt(i);
+											if ((++i < s.length()) && (Character.toUpperCase(s.charAt(i)) == 'E')) {
+											        fraction += s.charAt(i);
+												while ((++i < s.length()) && (Pattern.matches("\\.\\d+(E|e)(+|-)?\\d+", fraction)))
+												        fraction += s.charAt(i);
 											}
+
 											Token temp = new Token(RD_REAL, 
 													lexema+fraction, RD_REAL.ordinal(), count -1, i-lexema.length());
 											tokens.push(temp);
