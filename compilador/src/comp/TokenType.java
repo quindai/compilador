@@ -26,21 +26,11 @@ public enum TokenType {
 		private static final int LAST_SPECIAL_INDEX = COMA.ordinal();
 		 
 		String value;
-		int line, column;
 
 		TokenType(String value){
-				//this.code = code;
 				this.value = value;
 		}
-	
-		public void nextToken(){}
 		
-		public void setIdentConstValue(String value) {
-			this.value = value;
-		}
-		
-		private TokenType() {// TODO apagar construtor
-		}
 		 @Override
 	    public String toString() {
 	        return value;
