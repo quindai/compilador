@@ -11,6 +11,9 @@ import java.util.Deque;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 import static comp.TokenType.*;
 
 //https://www.baeldung.com/java-array-deque
@@ -103,7 +106,7 @@ public class Scan {
 							switch(s.charAt(i)) {
 							// capture identifiers
 								case ',': case '(': case '=': case ':': 
-									if (!contains(lexema)) { 
+									if (!contains(lexema) && !Character.isDigit(lexema.charAt(0))) { 
 										Token temp = new Token(IDENTIFIER,
 												lexema, IDENTIFIER.ordinal(), count -1, i-lexema.length());		
 								
@@ -116,7 +119,7 @@ public class Scan {
 								case '.':
 									if( lexema.matches("\\d+") ) {
 										if(Character.toString(s.charAt(i+1)).matches("\\d")){
-											String fraction = ""+s.charAt(i) + s.charAt(++i);
+											String fraction = ""+s.charAt(i);// + s.charAt(++i);
 											// reads next char if its number
 											//Pattern p = Pattern.compile("(\\d+|E?|e?)(+|-)?\\d+");
 											//Matcher m;
@@ -124,20 +127,30 @@ public class Scan {
 											//		Character.toString(s.charAt(i+1)).matches("(\\+|-)?\\d?"))){
 											//	fraction += s.charAt(++i);
 											//}
-											while ((++i < s.length()) && (Pattern.matches("\\.\\d+", fraction)))
+											//while ((++i < s.length()) && (Pattern.matches("\\.\\d+", fraction)))
+											while ((++i < s.length()) && Character.isDigit(s.charAt(i)))
 												fraction += s.charAt(i);
-											if ((++i < s.length()) && (Character.toUpperCase(s.charAt(i)) == 'E')) {
-											        fraction += s.charAt(i);
-												while ((++i < s.length()) && (Pattern.matches("\\.\\d+(E|e)(+|-)?\\d+", fraction)))
+											if ((i < s.length()) && (Character.toUpperCase(s.charAt(i)) == 'E')) {
+													fraction += s.charAt(i++);
+													//verifies if currentChar is '-'|'+' and reads only if nextChar is number
+												if ( (s.charAt(i) =='-' ||s.charAt(i) =='+') && 
+														Character.isDigit( s.charAt(i+1)) )
+											        fraction += s.charAt(i); //+""+ s.charAt(++i); // read nextChar 
+												//while ((++i < s.length()) && (Pattern.matches("\\.\\d+(E|e)(\\+|-)\\d+", fraction))) //capture subsequent char if are digits
+												while ((++i < s.length()) && Character.isDigit(s.charAt(i))) //capture subsequent char if are digits
 												        fraction += s.charAt(i);
 											}
 
-											Token temp = new Token(RD_REAL, 
-													lexema+fraction, RD_REAL.ordinal(), count -1, i-lexema.length());
-											tokens.push(temp);
-											
-											lexema = "";
-											System.out.print(tokens.getFirst().type.name() +" ");
+											lexema +=fraction;
+											//verifies if float was extracted properly
+											if(Pattern.matches("\\.\\d+((E|e)(\\+|-)?\\d+)?", fraction)){
+												Token temp = new Token(RD_REAL, 
+														lexema, RD_REAL.ordinal(), count -1, i-lexema.length());
+												tokens.push(temp);
+												
+												lexema = "";
+												System.out.print(tokens.getFirst().type.name() +" ");
+											}
 										}
 									}
 									break;
@@ -151,7 +164,7 @@ public class Scan {
 										tokens.push(temp);
 										lexema = "";
 										System.out.print(tokens.getFirst().type.name() +" ");
-									} else if(!contains(lexema)){
+									} else if(!contains(lexema) && !Character.isDigit(lexema.charAt(0))){
 										Token temp = new Token(IDENTIFIER,
 												lexema, IDENTIFIER.ordinal(), count -1, i-lexema.length());		
 								
