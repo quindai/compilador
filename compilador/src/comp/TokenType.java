@@ -19,11 +19,11 @@ public enum TokenType {
 		POW ("**"), SRBRAC ("]"), SLBRAC ("["), DIVIDE ("/"), RPAREN (")"), LPAREN ("("), RBRAC ("}"),
 		LBRAC ("{"), COLON (":"), SEMICOLON (";"),  COMA (","), DOUBLE_QUOTES ("\"");
 		
-		private static final int FIRST_RESERVED_INDEX = RD_INT.ordinal();
-		private static final int LAST_RESERVED_INDEX = INTCONSTANT.ordinal();
+		private static final int FIRST_RESERVED_INDEX = PGM.ordinal();
+		private static final int LAST_RESERVED_INDEX = RD_ERROR.ordinal();
 		
 		private static final int FIRST_SPECIAL_INDEX = COMMENT.ordinal();
-		private static final int LAST_SPECIAL_INDEX = COMA.ordinal();
+		private static final int LAST_SPECIAL_INDEX = DOUBLE_QUOTES.ordinal();
 		 
 		String value;
 

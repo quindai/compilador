@@ -14,9 +14,14 @@ public class Token {
 		this.line = line;
 		this.col = col;
 	}
+	
+	public String nextToken() {
+		return toString();
+	}
+	
 	@Override
 	public String toString() {
-		return String.format("%8s[%04d, %04d] (%04d, %20s) {%s}\n",
+		return String.format("%8s[%04d, %04d] (%04d, %20s) {%s}",
 					"",	line, col, ordinal, type.name(), value);
 	}
 
