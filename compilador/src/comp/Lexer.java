@@ -77,7 +77,7 @@ public class Lexer {
 							if(lexema.length()>0 )
 							switch(linha.charAt(i)) {
 							// capture identifiers
-								case ',': case '(': case '=': case ':': 
+								case ',': case '(': case '=': case ':': case '{': 
 									if (!contains(lexema) && !Character.isDigit(lexema.charAt(0))) { 
 										dAT(IDENTIFIER,	lexema, count, i-lexema.length());		
 										lexema = "";
@@ -172,7 +172,9 @@ public class Lexer {
 	}
 	
 	public boolean contains(String lexema){
-		return Arrays.stream(TokenType.values()).anyMatch(t -> t.toString().equalsIgnoreCase(lexema) && t.name()!=TokenType.IDENTIFIER.name());
+		return Arrays.stream(TokenType.values()).
+				anyMatch(t -> 
+				t.toString().equalsIgnoreCase(lexema));// && t.name()!=TokenType.IDENTIFIER.name());
 	}
 	
 	public TokenType getTokenType(String lexema){
