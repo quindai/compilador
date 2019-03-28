@@ -65,7 +65,8 @@ public class Lexer {
 								}while((linha.charAt(i) != '"') && (++i < linha.length()));
 
 								++i; // corrects the last char read
-								if(Pattern.compile("\".*\"").matcher(lexema).find()){
+								//if(Pattern.compile("\".*\"").matcher(lexema).find()){
+								if(lexema.charAt(lexema.length()-1) == '"') {
 									dAT(RD_STRING, lexema, count, i-lexema.length());		
 									lexema = "";
 								} else{
