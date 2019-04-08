@@ -104,6 +104,8 @@ public class Lexer {
 											}
 
 											lexema +=fraction;
+											
+											
 											//verifies if float was extracted properly
 											if(Pattern.matches("\\.\\d+((E|e)(\\+|-)?\\d+)?", fraction)){
 												dAT(RD_REAL, lexema, count, i-lexema.length());										

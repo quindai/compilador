@@ -1,6 +1,6 @@
 pgm
  int valor;
- func fibo(int n){
+ int func fibo(int n){
    int prev, atual, temp, i;
    prev = 0;
    i = 0;
@@ -16,6 +16,7 @@ pgm
          print(atual +",");
        }
      }
+     return 0;
   }
    main{
     fibo(10)

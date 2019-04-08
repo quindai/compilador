@@ -25,4 +25,8 @@ public class Token {
 					"",	line, col, ordinal, type.name(), value);
 	}
 
+	public static void main(String[] args) {
+		for(TokenType t: TokenType.values())
+			System.out.println(t.ordinal() + " "+ t +" "+t.name() );
+	}
 }

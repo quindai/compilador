@@ -1,7 +1,7 @@
 pgm   //Shell sort
-  array vet[10]:int;
+  int vet[10];
   int n;
-  func shellsort(array v[]:int, tam:int):[] int{
+  int[] func shellsort(int[] v, int tam){
     int i, j, h;
     int gap = 1;
     while(gap < tam){

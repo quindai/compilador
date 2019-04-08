@@ -8,15 +8,30 @@ public enum TokenType {
 		RD_BOOL ("bool"), 
 		RD_ARRAY ("array"), IF ("if"), ELSE ("else"), WHILE ("while"),  RD_RETURN ("return"),
 		FROM ("from"), REPEAT ("repeat"), MAIN ("main"),  
-		END_PGM ("end_pgm"), AND ("and"), MOD ("mod"), INTDIV ("div"), 
-		TO ("to"), TRUE ("true"), FALSE ("false"), OR ("or"), NOT ("not"), 
-		PRINT ("print"), FUNC ("func"), IDENTIFIER ("identifier"), STEP ("step"),
-		INTCONSTANT ("intconstant"), RD_ERROR ("rd_error"),
+		END_PGM ("end_pgm"),  
+		TO ("to"), TRUE ("true"), FALSE ("false"),  
+		PRINT ("print"), FUNC ("func"), STEP ("step"),
+		RD_ERROR ("rd_error"),
+		
+		//identificador
+		IDENTIFIER ("identifier"),
+		
+		//Literais
+		INTCONSTANT ("intconstant"), LIT_CHAR("lit_char"), LIT_STRING("lit_string"), LIT_BOOL("lit_bool"), 
+		
+		//Operadores aritmeticos
+		EQ("=="),UNARY ("~"), MULT ("*"), POW ("**"), PLUS ("+"), MINUS ("-"),
+		MOD ("mod"), INTDIV ("div"), 
+		
+		//Operadores logicos
+		OR ("or"), NOT ("not"),AND ("and"),
+		
+		//Operadores relacionais
+		NE ("<>"), LT ("<"), LE ("<="), GT (">"),GE (">="),
 		
 		// simbolos especiais
-		COMMENT ("//"),	EQ("=="), ASSIGN ("="), NE ("<>"), LT ("<"), LE ("<="), GT (">"), 
-		GE (">="), PLUS ("+"), MINUS ("-"), UNARY ("~"), MULT ("*"),
-		POW ("**"), SRBRAC ("]"), SLBRAC ("["), DIVIDE ("/"), RPAREN (")"), LPAREN ("("), RBRAC ("}"),
+		COMMENT ("//"),	ASSIGN ("="),  
+		SRBRAC ("]"), SLBRAC ("["), DIVIDE ("/"), RPAREN (")"), LPAREN ("("), RBRAC ("}"),
 		LBRAC ("{"), COLON (":"), SEMICOLON (";"),  COMA (","), DOUBLE_QUOTES ("\"");
 		
 		private static final int FIRST_RESERVED_INDEX = PGM.ordinal();
