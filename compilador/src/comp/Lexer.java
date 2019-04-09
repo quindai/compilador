@@ -1,7 +1,7 @@
 package comp;
 
 import static comp.TokenType.IDENTIFIER;
-import static comp.TokenType.INTCONSTANT;
+import static comp.TokenType.LIT_INT;
 import static comp.TokenType.RD_ERROR;
 import static comp.TokenType.RD_REAL;
 import static comp.TokenType.RD_STRING;
@@ -119,7 +119,7 @@ public class Lexer {
 								case ';': case ')': case '+': case '*': case '/': case '-': case ']': case '[':
 								case '>': case '<': case ' ': 
 									if( lexema.matches("\\d+")) {
-										dAT(INTCONSTANT, lexema, count, i-lexema.length());		
+										dAT(LIT_INT, lexema, count, i-lexema.length());		
 										lexema = "";
 									} else if(!contains(lexema) && !Character.isDigit(lexema.charAt(0))){
 										dAT(IDENTIFIER,	lexema, count, i-lexema.length());		

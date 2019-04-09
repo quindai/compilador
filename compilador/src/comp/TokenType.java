@@ -17,7 +17,8 @@ public enum TokenType {
 		IDENTIFIER ("identifier"),
 		
 		//Literais
-		INTCONSTANT ("intconstant"), LIT_CHAR("lit_char"), LIT_STRING("lit_string"), LIT_BOOL("lit_bool"), 
+		LIT_INT ("lit_int"), LIT_CHAR("lit_char"), LIT_STRING("lit_string"), LIT_BOOL("lit_bool"), 
+		LIT_REAL ("lit_real"),
 		
 		//Operadores aritmeticos
 		EQ("=="),UNARY ("~"), MULT ("*"), POW ("**"), PLUS ("+"), MINUS ("-"),

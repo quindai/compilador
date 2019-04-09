@@ -158,8 +158,8 @@ public class Scan {
 								case ';': case ')': case '+': case '*': case '/': case '-': case ']': case '[':
 								case '>': case '<': case ' ': 
 									if( lexema.matches("\\d+")) {
-										Token temp = new Token(INTCONSTANT,
-												lexema, INTCONSTANT.ordinal(), count -1, i-lexema.length());		
+										Token temp = new Token(LIT_INT,
+												lexema, LIT_INT.ordinal(), count -1, i-lexema.length());		
 								
 										tokens.push(temp);
 										lexema = "";
