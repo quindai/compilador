@@ -22,7 +22,7 @@ public class Grammar {
 	String EPSILON = "ε";
 
 	private void S() throws ParseException {
-		System.out.println("S = 'pgm' Decl MainDecl 'end_pgm'\n");
+		System.out.println("S = 'pgm' Decl MainDecl 'end_pgm'");
 		
 		lookahead = tokens.pollLast();
 		if(lookahead.getOrdinal() == 0) {
@@ -47,7 +47,7 @@ public class Grammar {
 	}
 	
 	private void MainDecl() throws ParseException {
-		System.out.println("MainDecl = 'main' '{' MainBody '}'\n");
+		System.out.println("\nMainDecl = 'main' '{' MainBody '}'");
 		
 		lookahead = tokens.pollLast();
 		if(lookahead.getOrdinal() == MAIN.ordinal()) {
@@ -72,10 +72,15 @@ public class Grammar {
 				1 );
 	}
 	
-	private void MainBody() {
-		
+	private void MainBody() throws ParseException {
+		VariableDecl();
+		STMTR();
 	}
 
+	private void STMTR() {
+		
+	}
+	
 	private void Decl() throws ParseException {
 		VariableDecl();
 		FunctionDecl();
@@ -114,7 +119,8 @@ public class Grammar {
 			if(lookahead.getOrdinal() == SLBRAC.ordinal()) {//vetor [
 				printAccepted();
 				lookahead = tokens.pollLast();
-				if(lookahead.getOrdinal() == LIT_INT.ordinal()) {
+				if(lookahead.getOrdinal() == LIT_INT.ordinal() ||
+						lookahead.getOrdinal() == LIT_REAL.ordinal()) {
 					printAccepted();
 					
 					lookahead = tokens.pollLast();
@@ -125,29 +131,45 @@ public class Grammar {
 									lookahead.getValue()), 
 									1 );
 				} else throw new ParseException(String
-						.format("Constante do tipo 'int' esperada, encontrou '%s'", 
+						.format("Constante literal esperada, encontrou '%s'", 
 								lookahead.getValue()), 
 								1 ); 
+			} else if (lookahead.getOrdinal() == ASSIGN.ordinal()) {
+				printAccepted();
 			}
 		}
-		
 	}
 	
 	private void VariableDecl() throws ParseException {
-		System.out.println("VariableDecl = TYPE ID VARIABLE ';'\n");
+		
 		lookahead = tokens.pollLast();
 		if (lookahead.getOrdinal() > 0 && lookahead.getOrdinal() < 6) { // Tipo
-			printAccepted();
-			while(lookahead.getOrdinal() != SEMICOLON.ordinal()) {
-				VARIABLE();
-				lookahead = tokens.pollLast();
-				if (lookahead.getOrdinal() == COMA.ordinal()) {
+			System.out.println("\nVariableDecl = TYPE ID VARIABLE ';'\n");
+			if (tokens.getLast().getOrdinal() != FUNC.ordinal()) {
+				printAccepted();
+				while(lookahead.getOrdinal() != SEMICOLON.ordinal() || !tokens.isEmpty()) {
 					VARIABLE();
-				} else if(lookahead.getOrdinal() == SEMICOLON.ordinal()) {
-					printAccepted();
+					lookahead = tokens.pollLast();
+					if (lookahead.getOrdinal() == COMA.ordinal()) {
+						VARIABLE(); 
+					} else if(lookahead.getOrdinal() == RD_ERROR.ordinal()) {
+						printAccepted();
+						
+						throw new ParseException(String
+								.format("Expressao aritmetica mal formada '%s'", 
+										lookahead.getValue()), 
+										3 ); 
+					}
+					else if(lookahead.getOrdinal() == SEMICOLON.ordinal()) {
+						printAccepted();
+					}
 				}
+			} else { //devolve simbolo
+				tokens.addLast(lookahead);
 			}
-		} 
+		} else {
+			tokens.addLast(lookahead);
+		}
 	}
 	
 	public Grammar(String args) throws ParseException {

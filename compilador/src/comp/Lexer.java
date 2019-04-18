@@ -1,10 +1,7 @@
 package comp;
 
-import static comp.TokenType.IDENTIFIER;
-import static comp.TokenType.LIT_INT;
-import static comp.TokenType.LIT_STRING;
-import static comp.TokenType.RD_ERROR;
-import static comp.TokenType.RD_REAL;
+import static comp.TokenType.*;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -109,7 +106,7 @@ public class Lexer {
 											
 											//verifies if float was extracted properly
 											if(Pattern.matches("\\.\\d+((E|e)(\\+|-)?\\d+)?", fraction)){
-												dAT(RD_REAL, lexema, count, i-lexema.length());										
+												dAT(LIT_REAL, lexema, count, i-lexema.length());										
 												lexema = "";
 												//System.out.print(tokens.getFirst().type.name() +" ");
 											}

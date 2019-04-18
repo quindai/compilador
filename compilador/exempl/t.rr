@@ -1,6 +1,6 @@
 pgm
    main{
-	real r = 5.-7;
+	real r = 5.7e-7;
 	print("Ola mundo");
 
 }
