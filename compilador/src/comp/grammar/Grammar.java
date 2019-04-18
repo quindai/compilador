@@ -12,6 +12,7 @@ import static comp.TokenType.*;
  * 
  * @author quindai LL1 descent predictive recursive
  * @see https://www.craftinginterpreters.com/parsing-expressions.html
+ * http://math.hws.edu/javanotes/c9/s5.html
  */
 public class Grammar {
 
@@ -77,8 +78,20 @@ public class Grammar {
 		STMTR();
 	}
 
-	private void STMTR() {
+	private void Expr() {
 		
+	}
+	
+	private void STMTRA() {
+		
+	}
+	
+	private void STMTR() {
+		Expr();
+		lookahead = tokens.pollLast();
+		if(lookahead.getOrdinal() == COMA.ordinal()) {
+			STMTRA();
+		}
 	}
 	
 	private void Decl() throws ParseException {
@@ -119,8 +132,7 @@ public class Grammar {
 			if(lookahead.getOrdinal() == SLBRAC.ordinal()) {//vetor [
 				printAccepted();
 				lookahead = tokens.pollLast();
-				if(lookahead.getOrdinal() == LIT_INT.ordinal() ||
-						lookahead.getOrdinal() == LIT_REAL.ordinal()) {
+				if(lookahead.getOrdinal() == LIT_INT.ordinal()) {
 					printAccepted();
 					
 					lookahead = tokens.pollLast();
@@ -135,8 +147,23 @@ public class Grammar {
 								lookahead.getValue()), 
 								1 ); 
 			} else if (lookahead.getOrdinal() == ASSIGN.ordinal()) {
-				printAccepted();
+				Atrib();
 			}
+		}
+	}
+	
+	private void Atrib() {
+		System.out.println("\nATRB = ID '=' Expr ';'\n");
+		printAccepted();
+		lookahead = tokens.pollLast();
+		
+		if(lookahead.getOrdinal() == LIT_REAL.ordinal() ||
+				lookahead.getOrdinal() == LIT_INT.ordinal() ||
+				lookahead.getOrdinal() == LIT_STRING.ordinal() ||
+				lookahead.getOrdinal() == LIT_CHAR.ordinal()) {
+			
+			System.out.println("\nFA = ID | FuncCall | 'lit_int' | 'lit_char' | 'lit_string' | 'lit_array' | 'lit_real'\n");
+			printAccepted();
 		}
 	}
 	
@@ -147,7 +174,7 @@ public class Grammar {
 			System.out.println("\nVariableDecl = TYPE ID VARIABLE ';'\n");
 			if (tokens.getLast().getOrdinal() != FUNC.ordinal()) {
 				printAccepted();
-				while(lookahead.getOrdinal() != SEMICOLON.ordinal() || !tokens.isEmpty()) {
+				while(lookahead.getOrdinal() != SEMICOLON.ordinal()) {
 					VARIABLE();
 					lookahead = tokens.pollLast();
 					if (lookahead.getOrdinal() == COMA.ordinal()) {
@@ -162,6 +189,8 @@ public class Grammar {
 					}
 					else if(lookahead.getOrdinal() == SEMICOLON.ordinal()) {
 						printAccepted();
+					} else { //devolve simbolo
+						tokens.addLast(lookahead);
 					}
 				}
 			} else { //devolve simbolo
