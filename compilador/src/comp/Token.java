@@ -15,6 +15,14 @@ public class Token {
 		this.col = col;
 	}
 	
+	public Token(TokenType type) {
+		this.type = type;
+		this.value = type.value;
+		this.ordinal = type.ordinal();
+		this.line = -1;
+		this.col = -1;
+	}
+	
 	public String nextToken() {
 		return toString();
 	}
@@ -25,8 +33,29 @@ public class Token {
 					"",	line, col, ordinal, type.name(), value);
 	}
 
-	public static void main(String[] args) {
+	public TokenType getType() {
+		return type;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
+	public int getOrdinal() {
+		return ordinal;
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public int getCol() {
+		return col;
+	}
+
+	
+	/*public static void main(String[] args) {
 		for(TokenType t: TokenType.values())
 			System.out.println(t.ordinal() + " "+ t +" "+t.name() );
-	}
+	}*/
 }

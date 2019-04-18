@@ -19,6 +19,8 @@ pgm
      return 0;
   }
    main{
-    fibo(10)
+    int n;
+    read(n);
+    fibo(n);
 }
 end_pgm

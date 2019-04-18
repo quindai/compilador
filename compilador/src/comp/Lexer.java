@@ -2,9 +2,9 @@ package comp;
 
 import static comp.TokenType.IDENTIFIER;
 import static comp.TokenType.LIT_INT;
+import static comp.TokenType.LIT_STRING;
 import static comp.TokenType.RD_ERROR;
 import static comp.TokenType.RD_REAL;
-import static comp.TokenType.RD_STRING;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 //http://java-regex-tester.appspot.com/
 //https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
 
+//http://knuth.luther.edu/~leekent/tutorials/ll1.html
 public class Lexer {
 	int count = 0;
 	private Deque<Token> tokens = new ArrayDeque<>();
@@ -67,7 +68,7 @@ public class Lexer {
 								++i; // corrects the last char read
 								//if(Pattern.compile("\".*\"").matcher(lexema).find()){
 								if(lexema.charAt(lexema.length()-1) == '"') {
-									dAT(RD_STRING, lexema, count, i-lexema.length());		
+									dAT(LIT_STRING, lexema, count, i-lexema.length());		
 									lexema = "";
 								} else{
 									dAT(RD_ERROR, lexema, count, i-lexema.length());		
@@ -184,6 +185,10 @@ public class Lexer {
 		return  Arrays.stream(TokenType.values())
 				.filter(t -> t.toString().equalsIgnoreCase(lexema))
 				.findFirst().get();
+	}
+	
+	public Deque<Token> getTokens(){
+		return tokens;
 	}
 	
 	public static void main(String[] args) {
