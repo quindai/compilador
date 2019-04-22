@@ -1,12 +1,35 @@
 package comp.grammar;
 
+import static comp.TokenType.ASSIGN;
+import static comp.TokenType.COMA;
+import static comp.TokenType.END_PGM;
+import static comp.TokenType.FIRST_LITERAL_INDEX;
+import static comp.TokenType.FIRST_TYPE_INDEX;
+import static comp.TokenType.FUNC;
+import static comp.TokenType.IDENTIFIER;
+import static comp.TokenType.LAST_LITERAL_INDEX;
+import static comp.TokenType.LAST_TYPE_INDEX;
+import static comp.TokenType.LBRAC;
+import static comp.TokenType.LIT_INT;
+import static comp.TokenType.LPAREN;
+import static comp.TokenType.MAIN;
+import static comp.TokenType.PGM;
+import static comp.TokenType.PRINT;
+import static comp.TokenType.RBRAC;
+import static comp.TokenType.RD_ERROR;
+import static comp.TokenType.REPEAT;
+import static comp.TokenType.RPAREN;
+import static comp.TokenType.SEMICOLON;
+import static comp.TokenType.SLBRAC;
+import static comp.TokenType.SRBRAC;
+
 import java.text.ParseException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 import comp.Lexer;
+import comp.Parser;
 import comp.Token;
-import static comp.TokenType.*;
 
 /**
  * 
@@ -23,15 +46,34 @@ public class Grammar {
 	//String EPSILON = "Îµ";
 	String EPSILON = "ε";
 
+	Parser parser;
+	
+	public Grammar(String args) throws ParseException {
+		long startTime = System.currentTimeMillis();
+		
+		//tokens = new Lexer(args).getTokens();
+		parser = new Parser(args);
+		System.out.printf("\n%10s---LL1 Grammar---\n%10s=================\n\n", "", "");		
+		S();
+		
+		float elapsedTime = (System.currentTimeMillis() - startTime)/1000f;
+		System.out.printf("\n>>>>>>>SINTATICO\n%10s%d linhas lidas\n%10s%.2f segundos\n\n",
+					"",	parser.getLineCount()-1,"", elapsedTime);
+	}
+
+	public static void main(String[] args) throws ParseException {
+		new Grammar(args[0]);
+	}
+	
 	private void S() throws ParseException {
 		System.out.println("S = 'pgm' Decl MainDecl 'end_pgm'");
 		
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if(lookahead.getOrdinal() == PGM.ordinal()) {
-			printAccepted();
+			//printAccepted();
 			Decl();
 			MainDecl();
-			lookahead = tokens.pollLast();
+			lookahead = parser.nextToken();
 			if(lookahead.getOrdinal() == END_PGM.ordinal())
 				printAccepted();
 			else throw new ParseException(String.format("Simbolo 'end_pgm' esperado, encontrou '%s'", 
@@ -51,16 +93,16 @@ public class Grammar {
 	private void MainDecl() throws ParseException {
 		System.out.println("\nMainDecl = 'main' '{' MainBody '}'");
 		
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if(lookahead.getOrdinal() == MAIN.ordinal()) {
 			printAccepted();
-			lookahead = tokens.pollLast();
+			lookahead = parser.nextToken();
 			if(lookahead.getOrdinal() == LBRAC.ordinal()) {
 				printAccepted();
 				
 				MainBody();
 				
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				if(lookahead.getOrdinal() == RBRAC.ordinal())
 					printAccepted();
 				else throw new ParseException(String.format("Simbolo '}' esperado, encontrou '%s'", 
@@ -80,7 +122,7 @@ public class Grammar {
 	}
 	
 	private void Expr() throws ParseException {
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		
 		/*if(lookahead.getOrdinal() == LIT_REAL.ordinal() ||
 				lookahead.getOrdinal() == LIT_INT.ordinal() ||
@@ -92,19 +134,19 @@ public class Grammar {
 			System.out.println("\nFA = ID | FuncCall | 'lit_int' | 'lit_char' | 'lit_string' | 'lit_array' | 'lit_real'\n");
 			printAccepted();
 			
-			lookahead = tokens.pollLast(); // verifica se eh funcao
+			lookahead = parser.nextToken(); // verifica se eh funcao
 			if(lookahead.getOrdinal() == FUNC.ordinal()){
 				printAccepted();
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				if(lookahead.getOrdinal() == IDENTIFIER.ordinal()){
 					printAccepted();
 					
-					lookahead = tokens.pollLast();
+					lookahead = parser.nextToken();
 					if(lookahead.getOrdinal() == LPAREN.ordinal()){
 						printAccepted();
 						Formals();
 						
-						lookahead = tokens.pollLast();
+						lookahead = parser.nextToken();
 						if(lookahead.getOrdinal() == RPAREN.ordinal()){
 							printAccepted();
 						} else throw new ParseException(String.format("Simbolo ')' esperado, encontrou '%s'", 
@@ -161,9 +203,9 @@ public class Grammar {
 	}
 	
 	private void Decl() throws ParseException {
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) { // Tipo
-			printAccepted();
+			//printAccepted();
 			VariableDecl();
 			FunctionDecl();
 			Decl();
@@ -189,19 +231,19 @@ public class Grammar {
 	}
 	
 	private void FunctionDecl() throws ParseException {
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) {
 			if (tokens.getLast().getOrdinal() == FUNC.ordinal()){ //se for funcao
 				System.out.println("\nFUNC = FUNCTYPE 'func' ID '(' Formals ')'  StmtBlock\n");
 				printAccepted();
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				printAccepted();
 				
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				if(lookahead.getOrdinal() == IDENTIFIER.ordinal()) {
 					printAccepted();
 					
-					lookahead = tokens.pollLast();
+					lookahead = parser.nextToken();
 					if(lookahead.getOrdinal() == LPAREN.ordinal()){
 						printAccepted();
 						//while(lookahead.getOrdinal() != RPAREN.ordinal())
@@ -243,7 +285,9 @@ public class Grammar {
 		*/
 				//while(lookahead.getOrdinal() != SEMICOLON.ordinal()) {
 			System.out.println("\nVariableDecl = TYPE ID VARIABLE ';'\n");
+			
 			VARIABLE();
+			
 			
 //			if (lookahead.getOrdinal() == SEMICOLON.ordinal()) {
 //				printAccepted();
@@ -282,7 +326,7 @@ public class Grammar {
 	}
 
 	private void Tipo() throws ParseException {
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX)
 			printAccepted();
 		else throw new ParseException(String
@@ -292,17 +336,17 @@ public class Grammar {
 	}
 	
 	private void VARIABLE() throws ParseException {
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if(lookahead.getOrdinal() == IDENTIFIER.ordinal()) {
 			printAccepted();
-			lookahead = tokens.pollLast();
+			lookahead = parser.nextToken();
 			if(lookahead.getOrdinal() == SLBRAC.ordinal()) {//vetor [
 				printAccepted();
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				if(lookahead.getOrdinal() == LIT_INT.ordinal()) {
 					printAccepted();
 					
-					lookahead = tokens.pollLast();
+					lookahead = parser.nextToken();
 					if(lookahead.getOrdinal() == SRBRAC.ordinal()) {//vetor ]
 						printAccepted();
 					} else throw new ParseException(String
@@ -361,47 +405,36 @@ public class Grammar {
 	}
 	
 	private void Stmt(){
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		if(lookahead.getOrdinal() == REPEAT.ordinal()){
 			
 		}
 	}
 	
 	private void StmtBlock() throws ParseException{
-		lookahead = tokens.pollLast();
+		lookahead = parser.nextToken();
 		
 		if(lookahead.getOrdinal() == LBRAC.ordinal()){
 			printAccepted();
 			
-			lookahead = tokens.pollLast();
+			lookahead = parser.nextToken();
 			if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) { // Tipo
 				printAccepted();
 			    VariableDecl();
 			}
 			
-			lookahead = tokens.pollLast();
+			lookahead = parser.nextToken();
 			if(lookahead.getOrdinal() == SEMICOLON.ordinal()){
 				printAccepted();
 				
 				Stmt();
 				
-				lookahead = tokens.pollLast();
+				lookahead = parser.nextToken();
 				if(lookahead.getOrdinal() == RBRAC.ordinal()){
 					printAccepted();
 				}
 			}
 			
 		}
-	}
-	
-	
-	public Grammar(String args) throws ParseException {
-		tokens = new Lexer(args).getTokens();
-		System.out.printf("\n%10s---LL1 Grammar---\n%10s=================\n\n", "", "");		
-		S();
-	}
-
-	public static void main(String[] args) throws ParseException {
-		new Grammar(args[0]);
 	}
 }

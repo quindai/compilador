@@ -25,7 +25,7 @@ public enum TokenType {
 		LIT_REAL ("lit_real"),
 		
 		//Operadores aritmeticos
-		EQ("=="),UNARY ("~"), MULT ("*"), POW ("**"), PLUS ("+"), MINUS ("-"),
+		EQ("=="), UNARY ("~"), MULT ("*"), POW ("**"), PLUS ("+"), MINUS ("-"),
 		MOD ("mod"), INTDIV ("div"), 
 		
 		//Operadores logicos

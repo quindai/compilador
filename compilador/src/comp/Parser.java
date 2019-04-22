@@ -27,7 +27,8 @@ public class Parser {
 		}
 	}
 	
-	public boolean nextToken() {
+	public Token nextToken() {
+		Token retorno = null;
 		if(scan.hasNextLine()) {
 			String linha = scan.nextLine();
 			int i = 0;
@@ -67,10 +68,10 @@ public class Parser {
 						++i; // corrects the last char read
 						//if(Pattern.compile("\".*\"").matcher(lexema).find()){
 						if(lexema.charAt(lexema.length()-1) == '"') {
-							dAT(LIT_STRING, lexema, count, i-lexema.length());		
+							retorno = dAT(LIT_STRING, lexema, count, i-lexema.length());		
 							lexema = "";
 						} else{
-							dAT(RD_ERROR, lexema, count, i-lexema.length());		
+							retorno = dAT(RD_ERROR, lexema, count, i-lexema.length());		
 							lexema = "";
 						}
 					}
@@ -80,7 +81,7 @@ public class Parser {
 					// capture identifiers
 						case ',': case '(': case '=': case ':': case '{': 
 							if (!contains(lexema) && !Character.isDigit(lexema.charAt(0))) { 
-								dAT(IDENTIFIER,	lexema, count, i-lexema.length());		
+								retorno = dAT(IDENTIFIER,	lexema, count, i-lexema.length());		
 								lexema = "";
 								//System.out.print(tokens.getFirst().type.name() +" ");
 							}
@@ -108,7 +109,7 @@ public class Parser {
 									
 									//verifies if float was extracted properly
 									if(Pattern.matches("\\.\\d+((E|e)(\\+|-)?\\d+)?", fraction)){
-										dAT(LIT_REAL, lexema, count, i-lexema.length());										
+										retorno = dAT(LIT_REAL, lexema, count, i-lexema.length());										
 										lexema = "";
 										//System.out.print(tokens.getFirst().type.name() +" ");
 									}
@@ -119,10 +120,10 @@ public class Parser {
 						case ';': case ')': case '+': case '*': case '/': case '-': case ']': case '[':
 						case '>': case '<': case ' ': 
 							if( lexema.matches("\\d+")) {
-								dAT(LIT_INT, lexema, count, i-lexema.length());		
+								retorno = dAT(LIT_INT, lexema, count, i-lexema.length());		
 								lexema = "";
 							} else if(!contains(lexema) && !Character.isDigit(lexema.charAt(0))){
-								dAT(IDENTIFIER,	lexema, count, i-lexema.length());		
+								retorno = dAT(IDENTIFIER,	lexema, count, i-lexema.length());		
 								lexema = "";
 								//System.out.print(tokens.getFirst().type.name() +" ");
 							}
@@ -133,21 +134,21 @@ public class Parser {
 				boolean b = contains(lexema);
 				
 				if (b) {
-					dAT(getTokenType(lexema), lexema, count, i-lexema.length());		
+					retorno = dAT(getTokenType(lexema), lexema, count, i-lexema.length());		
 	
 					lexema = "";
 					//System.out.print(tokens.getFirst().type.name() +" ");
 					continue;
 				} else if((i == linha.length()) && !lexema.isEmpty()){
 					// capture some malformed line, identify as error category
-					dAT(RD_ERROR, lexema, count, i-lexema.length());		
+					retorno = dAT(RD_ERROR, lexema, count, i-lexema.length());		
 				
 					lexema = "";
 					//System.out.print(tokens.getFirst().type.name() +" ");
 				}
 			}
-			return true;
-		} else return false;
+			return retorno;
+		} else return null; //EOF
 	}
 	
 	/**
@@ -157,10 +158,11 @@ public class Parser {
 	 * @param line	: line
 	 * @param col	: col
 	 */
-	private void dAT(TokenType t, String lex, int line, int col) {
+	private Token dAT(TokenType t, String lex, int line, int col) {
 		Token temp = new Token(t, lex, t.ordinal(), line, col+1);		
 		//tokens.push(temp);
 		System.out.println(temp);
+		return temp;
 	}
 	
 	public boolean contains(String lexema){
@@ -173,6 +175,10 @@ public class Parser {
 		return  Arrays.stream(TokenType.values())
 				.filter(t -> t.toString().equalsIgnoreCase(lexema))
 				.findFirst().get();
+	}
+	
+	public int getLineCount() {
+		return count;
 	}
 	
 	public static void main(String[] args) throws IOException {
