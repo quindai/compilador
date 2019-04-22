@@ -51,7 +51,7 @@ public enum TokenType {
 		public static final int LAST_LITERAL_INDEX = LIT_REAL.ordinal();
 		
 		public static final int FIRST_TYPE_INDEX = RD_INT.ordinal();
-		public static final int LAST_TYPE_INDEX = RD_VOID.ordinal();
+		public static final int LAST_TYPE_INDEX = RD_ARRAY.ordinal();
 		 
 		String value;
 
