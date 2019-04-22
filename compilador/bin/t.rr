@@ -1,7 +1,1 @@
 pgm
-   main{
-	real r = 5.7e-7;
-	print("Ola mundo");
-
-}
-end_pgm

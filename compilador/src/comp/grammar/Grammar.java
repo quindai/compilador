@@ -27,7 +27,7 @@ public class Grammar {
 		System.out.println("S = 'pgm' Decl MainDecl 'end_pgm'");
 		
 		lookahead = tokens.pollLast();
-		if(lookahead.getOrdinal() == 0) {
+		if(lookahead.getOrdinal() == PGM.ordinal()) {
 			printAccepted();
 			Decl();
 			MainDecl();
@@ -382,7 +382,6 @@ public class Grammar {
 			lookahead = tokens.pollLast();
 			if(lookahead.getOrdinal() == SEMICOLON.ordinal()){
 				printAccepted();
-				
 				
 				Stmt();
 				
