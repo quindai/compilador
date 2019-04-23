@@ -24,11 +24,8 @@ import static comp.TokenType.SLBRAC;
 import static comp.TokenType.SRBRAC;
 
 import java.text.ParseException;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Stack;
 
-import comp.Lexer;
-import comp.Parser;
 import comp.Token;
 
 /**
@@ -39,20 +36,20 @@ import comp.Token;
  */
 public class Grammar {
 
-	private Deque<Token> tokens = new ArrayDeque<>();
+	private Stack<Token> tokens = new Stack<>();
 	Token lookahead;
 	String aceita = "";
 
 	//String EPSILON = "Îµ";
 	String EPSILON = "ε";
 
-	Parser parser;
+	ParserForGrammar parser;
 	
 	public Grammar(String args) throws ParseException {
 		long startTime = System.currentTimeMillis();
 		
 		//tokens = new Lexer(args).getTokens();
-		parser = new Parser(args);
+		parser = new ParserForGrammar(args);
 		System.out.printf("\n%10s---LL1 Grammar---\n%10s=================\n\n", "", "");		
 		S();
 		
@@ -65,15 +62,25 @@ public class Grammar {
 		new Grammar(args[0]);
 	}
 	
+	private void next(){
+		if(tokens.isEmpty()){
+			tokens = parser.nextToken();
+		}
+		
+		lookahead = tokens.remove(0);
+	}
+	
 	private void S() throws ParseException {
 		System.out.println("S = 'pgm' Decl MainDecl 'end_pgm'");
 		
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.remove(0);
 		if(lookahead.getOrdinal() == PGM.ordinal()) {
-			//printAccepted();
+			printAccepted();
 			Decl();
 			MainDecl();
-			lookahead = parser.nextToken();
+			next();
+			//lookahead = tokens.pop();
 			if(lookahead.getOrdinal() == END_PGM.ordinal())
 				printAccepted();
 			else throw new ParseException(String.format("Simbolo 'end_pgm' esperado, encontrou '%s'", 
@@ -87,22 +94,45 @@ public class Grammar {
 	}
 	
 	private void printAccepted() {
-		System.out.printf("%10s"+lookahead.getValue() +" ", "");
+		//System.out.printf("%10s"+lookahead.getValue() +" ", "");
+		System.out.println(lookahead);
+	}
+	
+	private void Decl() throws ParseException {
+		next();
+		//lookahead = tokens.pop();
+		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) { // Tipo
+			//printAccepted();
+			VariableDecl();
+			FunctionDecl();
+			Decl();
+		} else if (lookahead.getOrdinal() == MAIN.ordinal()) {
+			//devolve
+			//System.out.println("Decl "+ EPSILON);
+			tokens.insertElementAt(lookahead, 0);
+			//addLast(lookahead);
+		} else throw new ParseException(String
+				.format("'main' ou tipo esperado, encontrou '%s'", 
+				lookahead.getValue()), 
+				1 );
 	}
 	
 	private void MainDecl() throws ParseException {
 		System.out.println("\nMainDecl = 'main' '{' MainBody '}'");
 		
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		if(lookahead.getOrdinal() == MAIN.ordinal()) {
 			printAccepted();
-			lookahead = parser.nextToken();
+			next();
+			//lookahead = tokens.pop();
 			if(lookahead.getOrdinal() == LBRAC.ordinal()) {
 				printAccepted();
 				
 				MainBody();
 				
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == RBRAC.ordinal())
 					printAccepted();
 				else throw new ParseException(String.format("Simbolo '}' esperado, encontrou '%s'", 
@@ -122,7 +152,8 @@ public class Grammar {
 	}
 	
 	private void Expr() throws ParseException {
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		
 		/*if(lookahead.getOrdinal() == LIT_REAL.ordinal() ||
 				lookahead.getOrdinal() == LIT_INT.ordinal() ||
@@ -134,19 +165,23 @@ public class Grammar {
 			System.out.println("\nFA = ID | FuncCall | 'lit_int' | 'lit_char' | 'lit_string' | 'lit_array' | 'lit_real'\n");
 			printAccepted();
 			
-			lookahead = parser.nextToken(); // verifica se eh funcao
+			next();
+			//lookahead = tokens.pop(); // verifica se eh funcao
 			if(lookahead.getOrdinal() == FUNC.ordinal()){
 				printAccepted();
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == IDENTIFIER.ordinal()){
 					printAccepted();
 					
-					lookahead = parser.nextToken();
+					next();
+					//lookahead = tokens.pop();
 					if(lookahead.getOrdinal() == LPAREN.ordinal()){
 						printAccepted();
 						Formals();
 						
-						lookahead = parser.nextToken();
+						next();
+						//lookahead = tokens.pop();
 						if(lookahead.getOrdinal() == RPAREN.ordinal()){
 							printAccepted();
 						} else throw new ParseException(String.format("Simbolo ')' esperado, encontrou '%s'", 
@@ -160,7 +195,8 @@ public class Grammar {
 			
 		} else{
 			System.out.println("Expr "+EPSILON);
-			tokens.addLast(lookahead);
+			tokens.insertElementAt(lookahead, 0);
+			//tokens.addLast(lookahead);
 		}
 	} 
 	
@@ -171,26 +207,31 @@ public class Grammar {
 	private void STMTR() throws ParseException {
 		Expr();
 		
-		lookahead = tokens.pollLast();
+		next();
+		//lookahead = tokens.pop();
 		if(lookahead.getOrdinal() == SEMICOLON.ordinal()) {
 			STMTRA();
 		} else{
 			System.out.println("STMTR "+EPSILON);
-			tokens.addLast(lookahead);
+			tokens.insertElementAt(lookahead, 0);
 		}
 		
-		lookahead = tokens.pollLast();  //PrintStmt
+		next();
+		//lookahead = tokens.pop();  //PrintStmt
 		if(lookahead.getOrdinal() == PRINT.ordinal()){
 			System.out.println("\nPrintStmt = 'print' '(' Expr ')' ';'");
 			printAccepted();
-			lookahead = tokens.pollLast();
+			next();
+			//lookahead = tokens.pop();
 			if(lookahead.getOrdinal() == LPAREN.ordinal()){
 				printAccepted();
 				Expr();
-				lookahead = tokens.pollLast();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == RPAREN.ordinal()){
 					printAccepted();
-					lookahead = tokens.pollLast();
+					next();
+					//lookahead = tokens.pop();
 					if(lookahead.getOrdinal() == SEMICOLON.ordinal()){
 						printAccepted();
 					}
@@ -198,26 +239,12 @@ public class Grammar {
 			}
 		} else{
 			System.out.println("STMTR "+ EPSILON);
-			tokens.addLast(lookahead);
+			tokens.insertElementAt(lookahead, 0);
+			//tokens.addLast(lookahead);
 		}
 	}
 	
-	private void Decl() throws ParseException {
-		lookahead = parser.nextToken();
-		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) { // Tipo
-			//printAccepted();
-			VariableDecl();
-			FunctionDecl();
-			Decl();
-		} else if (lookahead.getOrdinal() == MAIN.ordinal()) {
-			//devolve
-			//System.out.println("Decl "+ EPSILON);
-			tokens.addLast(lookahead);
-		} else throw new ParseException(String
-				.format("'main' ou tipo esperado, encontrou '%s'", 
-				lookahead.getValue()), 
-				1 );
-	}
+	
 	
 	private void Formals() throws ParseException{
 		
@@ -231,19 +258,23 @@ public class Grammar {
 	}
 	
 	private void FunctionDecl() throws ParseException {
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) {
-			if (tokens.getLast().getOrdinal() == FUNC.ordinal()){ //se for funcao
+			if (tokens.peek().getOrdinal() == FUNC.ordinal()){ //se for funcao
 				System.out.println("\nFUNC = FUNCTYPE 'func' ID '(' Formals ')'  StmtBlock\n");
 				printAccepted();
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				printAccepted();
 				
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == IDENTIFIER.ordinal()) {
 					printAccepted();
 					
-					lookahead = parser.nextToken();
+					next();
+					//lookahead = tokens.pop();
 					if(lookahead.getOrdinal() == LPAREN.ordinal()){
 						printAccepted();
 						//while(lookahead.getOrdinal() != RPAREN.ordinal())
@@ -285,7 +316,7 @@ public class Grammar {
 		*/
 				//while(lookahead.getOrdinal() != SEMICOLON.ordinal()) {
 			System.out.println("\nVariableDecl = TYPE ID VARIABLE ';'\n");
-			
+			printAccepted();
 			VARIABLE();
 			
 			
@@ -326,7 +357,8 @@ public class Grammar {
 	}
 
 	private void Tipo() throws ParseException {
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX)
 			printAccepted();
 		else throw new ParseException(String
@@ -336,17 +368,21 @@ public class Grammar {
 	}
 	
 	private void VARIABLE() throws ParseException {
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		if(lookahead.getOrdinal() == IDENTIFIER.ordinal()) {
 			printAccepted();
-			lookahead = parser.nextToken();
+			next();
+			//lookahead = tokens.pop();
 			if(lookahead.getOrdinal() == SLBRAC.ordinal()) {//vetor [
 				printAccepted();
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == LIT_INT.ordinal()) {
 					printAccepted();
 					
-					lookahead = parser.nextToken();
+					next();
+					//lookahead = tokens.pop();
 					if(lookahead.getOrdinal() == SRBRAC.ordinal()) {//vetor ]
 						printAccepted();
 					} else throw new ParseException(String
@@ -384,7 +420,7 @@ public class Grammar {
 		
 		else{ //devolve
 			System.out.println("VARIABLE "+ EPSILON);
-			tokens.addLast(lookahead);
+			tokens.insertElementAt(lookahead, 0);
 		}
 	}
 	
@@ -405,31 +441,36 @@ public class Grammar {
 	}
 	
 	private void Stmt(){
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		if(lookahead.getOrdinal() == REPEAT.ordinal()){
 			
 		}
 	}
 	
 	private void StmtBlock() throws ParseException{
-		lookahead = parser.nextToken();
+		next();
+		//lookahead = tokens.pop();
 		
 		if(lookahead.getOrdinal() == LBRAC.ordinal()){
 			printAccepted();
 			
-			lookahead = parser.nextToken();
+			next();
+			//lookahead = tokens.pop();
 			if (lookahead.getOrdinal() >= FIRST_TYPE_INDEX && lookahead.getOrdinal() <= LAST_TYPE_INDEX) { // Tipo
 				printAccepted();
 			    VariableDecl();
 			}
 			
-			lookahead = parser.nextToken();
+			next();
+			//lookahead = tokens.pop();
 			if(lookahead.getOrdinal() == SEMICOLON.ordinal()){
 				printAccepted();
 				
 				Stmt();
 				
-				lookahead = parser.nextToken();
+				next();
+				//lookahead = tokens.pop();
 				if(lookahead.getOrdinal() == RBRAC.ordinal()){
 					printAccepted();
 				}
